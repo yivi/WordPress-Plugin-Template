@@ -108,7 +108,13 @@ class WordPress_Plugin_Template_Admin_API {
 
 				$html .= "<span class='repeater-group'>";
 
+				$fields_per_group = count( $field['options'] );
+				$count_fields = 0;
+
+				$html .= "<span class='repeater-group'>";
+
 				foreach ( $data as $group_of_fields ) {
+					$html .= "<span class= 'repeater-fields'>\n";
 					foreach ( $group_of_fields as $group_field ) {
 						## setting whatever else we need to capture this fields later on
 						$group_field['prefix'] = $field['id'] . '_';
@@ -116,12 +122,18 @@ class WordPress_Plugin_Template_Admin_API {
 						$group_field['data'] = $group_field['value'];
 						$html .= '<p class="form-field"><label for="' . esc_attr( $group_field['id'] ) . '">' . esc_attr( $group_field['label'] ) . '</label>';
 						$html .= $this->display_field( $group_field, $post, false );
+						$html .= '</p>';
+
+						# closes the span on after completing each group.
+						# both for styling and for add/remove options
+						if ( $count_fields % $fields_per_group == 0) {
+							$html .= "\n</span>";
+							$html .= "<span class= 'repeater-fields'>\n";
+						}
 					}
 				}
-				$html .= "</span>\n";
 
-				$html .= "<span class='repeater-group'>";
-
+				$html .= "<span class='repeater-fields'>";
 				foreach ( $field['options'] as $repeatable_field ) {
 					$repeatable_field['prefix'] = $field['id'] . '_';
 					$repeatable_field['suffix'] = '[]';
@@ -129,6 +141,7 @@ class WordPress_Plugin_Template_Admin_API {
 					$html .= $this->display_field($repeatable_field, $post, false);
 				}
 				$html .= "</span>\n";
+				$html .= "</span>\n"; # outer span '.repeater-group'
 
 				break;
 
