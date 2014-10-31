@@ -110,12 +110,18 @@ class WordPress_Plugin_Template_Admin_API {
 
 				$fields_per_group = count( $field['options'] );
 				$count_fields = 0;
-
-				$html .= "<span class='repeater-group'>";
+				$open_tag = true;
 
 				foreach ( $data as $group_of_fields ) {
-					$html .= "<span class= 'repeater-fields'>\n";
 					foreach ( $group_of_fields as $group_field ) {
+						$count_fields++;
+
+						if ( $open_tag ) {
+							$open_tag = false;
+							$id_field = "repeater-fields-$count_fields";
+							$html .= "<div class='repeater-fields' id='$id_field' >";
+						}
+
 						## setting whatever else we need to capture this fields later on
 						$group_field['prefix'] = $field['id'] . '_';
 						$group_field['suffix'] = '[]';
@@ -123,25 +129,28 @@ class WordPress_Plugin_Template_Admin_API {
 						$html .= '<p class="form-field"><label for="' . esc_attr( $group_field['id'] ) . '">' . esc_attr( $group_field['label'] ) . '</label>';
 						$html .= $this->display_field( $group_field, $post, false );
 						$html .= '</p>';
-
-						# closes the span on after completing each group.
-						# both for styling and for add/remove options
-						if ( $count_fields % $fields_per_group == 0) {
-							$html .= "\n</span>";
-							$html .= "<span class= 'repeater-fields'>\n";
+						if ( $count_fields % $fields_per_group == 0 ) {
+							$html .= "<a class='repeater-remover'>" . __('Remove Group', $this->textdomain) . "</a>";
+							$html .= "\n</div>";
+							$open_tag = true;
 						}
 					}
+
 				}
 
-				$html .= "<span class='repeater-fields'>";
+				$html .= "<div class='repeater-fields template' style='display: none'>\n";
 				foreach ( $field['options'] as $repeatable_field ) {
 					$repeatable_field['prefix'] = $field['id'] . '_';
-					$repeatable_field['suffix'] = '[]';
+					$repeatable_field['suffix'] = '-template';
 					$html .= '<p class="form-field"><label for="' . esc_attr($repeatable_field['id']) . '">' . esc_attr($repeatable_field['label']) . '</label>';
 					$html .= $this->display_field($repeatable_field, $post, false);
+					$html .= '</p>';
 				}
-				$html .= "</span>\n";
-				$html .= "</span>\n"; # outer span '.repeater-group'
+				$html .= "<a class='repeater-remover'>" . __('Remove Group', $this->textdomain) . "</a>";
+				$html .= "\n</div>";
+
+				$html .= "<a class='repeater-adder'>" . __('Add New', $this->textdomain) . "</a>";
+
 
 				break;
 
