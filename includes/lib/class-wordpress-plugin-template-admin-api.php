@@ -484,7 +484,12 @@ class WordPress_Plugin_Template_Admin_API {
 		$field_keys  = wp_list_pluck( $repeater_field['options'], 'id' );
 
 		# get how many repetitions we have
-		$count =  count($_REQUEST[$repeater_field['id'] . '_' . $field_keys[0]]);
+		if ( isset( $_REQUEST[ $repeater_field['id'] . '_' . $field_keys[0] ] ) ) {
+			$count = count( $_REQUEST[ $repeater_field['id'] . '_' . $field_keys[0] ] );
+		}
+		else {
+			$count = 0;
+		}
 
 		for ( $i = 0; $i < $count; $i++ ) {
 			# iterate through all the repeatable groups
